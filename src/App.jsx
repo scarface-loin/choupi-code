@@ -20,6 +20,7 @@ function App() {
   const [completedLabs, setCompletedLabs] = useState(new Set());
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showChoupi, setShowChoupi] = useState(true);
   
   // États pour le chargement initial
   const [isLoading, setIsLoading] = useState(true);
@@ -54,6 +55,7 @@ function App() {
 
   // Confetti explosif amélioré avec effet "POUF"
   const triggerConfetti = () => {
+    setShowChoupi(true);
     // Attendre que confetti soit chargé
     const shootConfetti = () => {
       if (typeof window.confetti === 'undefined') {
@@ -176,6 +178,7 @@ function App() {
       setShowHint(false);
       setAttempts(0);
       setShowError(false);
+      setShowChoupi(true);
     }
   };
 
@@ -189,6 +192,7 @@ function App() {
       setShowHint(false);
       setAttempts(0);
       setShowError(false);
+      setShowChoupi(true);
     }
   };
 
@@ -198,7 +202,44 @@ function App() {
     setIsSuccess(false);
     setShowHint(false);
     setShowError(false);
+    setShowChoupi(true);
   };
+
+  // Déterminer quelle image et message afficher
+  const getChoupiState = () => {
+    if (isSuccess) {
+      return {
+        image: 'succes.png',
+        message: 'Incroyable Choupi ! Tu es vraiment doué ! 🌟',
+        bgColor: 'from-green-400/20 to-emerald-500/20',
+        borderColor: 'border-green-400/40'
+      };
+    }
+    if (showError) {
+      return {
+        image: 'question.png',
+        message: 'Hmm... Peut-être qu\'il faut vérifier quelque chose ? 🤔',
+        bgColor: 'from-orange-400/20 to-red-500/20',
+        borderColor: 'border-orange-400/40'
+      };
+    }
+    if (showHint) {
+      return {
+        image: 'indice.png',
+        message: 'Laisse-moi t\'aider un peu ! 💡',
+        bgColor: 'from-yellow-400/20 to-amber-500/20',
+        borderColor: 'border-yellow-400/40'
+      };
+    }
+    return {
+      image: 'welcome.png',
+      message: 'Salut Choupi ! Prêt pour cette mission ? 🚀',
+      bgColor: 'from-indigo-400/20 to-purple-500/20',
+      borderColor: 'border-indigo-400/40'
+    };
+  };
+
+  const choupiState = getChoupiState();
 
   // --- RENDU CHARGEMENT ---
   if (isLoading) {
@@ -302,7 +343,52 @@ function App() {
       <main className="flex-1 flex p-4 gap-4 overflow-hidden bg-[radial-gradient(circle_at_50%_-20%,#1e1b4b,transparent)]">
         
         {/* Colonne Gauche */}
-        <div className="w-1/3 bg-slate-900/40 border border-slate-800/60 rounded-3xl p-8 overflow-y-auto backdrop-blur-sm shadow-2xl">
+        <div className="w-1/3 bg-slate-900/40 border border-slate-800/60 rounded-3xl p-8 overflow-y-auto backdrop-blur-sm shadow-2xl relative">
+          
+          {/* Choupi Assistant avec bulle de dialogue */}
+          {showChoupi && (
+            <div className="mb-8 animate-in slide-in-from-left duration-700 relative">
+              {/* Bulle de dialogue */}
+              <div className={`relative bg-gradient-to-br ${choupiState.bgColor} border-2 ${choupiState.borderColor} rounded-3xl p-6 mb-4 shadow-2xl backdrop-blur-sm`}>
+                <div className={`absolute -bottom-3 left-12 w-6 h-6 bg-gradient-to-br ${choupiState.bgColor} border-r-2 border-b-2 ${choupiState.borderColor} transform rotate-45`}></div>
+                <p className="text-white font-semibold text-base leading-relaxed relative z-10">
+                  {choupiState.message}
+                </p>
+              </div>
+              
+              {/* Image de Choupi */}
+              <div className="flex items-start gap-4">
+                <div className="relative group">
+                  <div className="absolute -inset-2 bg-gradient-to-br from-indigo-500/30 to-purple-500/30 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <img 
+                    src={choupiState.image}
+                    alt="Choupi Assistant"
+                    className="w-20 h-20 rounded-full border-4 border-white/10 shadow-xl relative z-10 object-cover animate-in zoom-in duration-500"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                </div>
+                <button
+                  onClick={() => setShowChoupi(false)}
+                  className="ml-auto text-slate-500 hover:text-slate-300 transition-colors text-xs"
+                  title="Masquer l'assistant"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Bouton pour réafficher Choupi */}
+          {!showChoupi && (
+            <button
+              onClick={() => setShowChoupi(true)}
+              className="mb-6 flex items-center gap-2 text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors"
+            >
+              <Sparkles size={16} /> Afficher l'assistant
+            </button>
+          )}
           
           {/* En-tête mission */}
           <div className="flex items-center justify-between mb-6">
