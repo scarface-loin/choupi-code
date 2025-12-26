@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optionnel : pour un look plus sombre sur toute la page */
+body {
+  @apply bg-slate-950;
+}
